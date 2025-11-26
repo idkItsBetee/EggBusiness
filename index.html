@@ -52,15 +52,16 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, collection, addDoc, onSnapshot, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  // 🔴 REPLACE WITH YOUR FIREBASE CONFIG
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "SENDER_ID",
-    appId: "APP_ID"
-  };
+ // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAI1XaN06qQL_HubtzjvjEYcqbE1P9HFbc",
+  authDomain: "eggbusiness-b810c.firebaseapp.com",
+  projectId: "eggbusiness-b810c",
+  storageBucket: "eggbusiness-b810c.firebasestorage.app",
+  messagingSenderId: "186139497776",
+  appId: "1:186139497776:web:bbd944e4dc62565ffba4f5",
+  measurementId: "G-R3NTM2MXML"
+};
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
@@ -128,4 +129,5 @@
 
 </body>
 </html>
+
 
