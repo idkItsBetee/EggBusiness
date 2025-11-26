@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Egg Loanee Tracker — Online</title>
+<title>Egg Loanee Tracker — Online (Secure)</title>
 <style>
   body { font-family: Arial, sans-serif; background:#fdfdfd; padding:20px; }
   h1 { text-align:center; color:#333; }
@@ -19,7 +19,7 @@
 </head>
 <body>
 
-<h1>🥚 Egg Loanee Tracker — Online (Realtime DB)</h1>
+<h1>🥚 Egg Loanee Tracker — Secure Online</h1>
 
 <form id="loaneeForm">
   <input type="text" id="name" placeholder="Name" required>
@@ -49,45 +49,31 @@
 
 <!-- Firebase SDKs -->
 <script type="module">
-  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-const auth = getAuth();
-signInAnonymously(auth)
-  .then(() => {
-    console.log("Signed in anonymously");
-  })
-  .catch(error => {
-    console.error("Auth error:", error);
-  });
-
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  // Replace with your Firebase config
+  // Firebase config — replace YOUR_* with your project info
   const firebaseConfig = {
     apiKey: "YOUR_API_KEY",
     authDomain: "YOUR_PROJECT.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
+    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+    projectId: "YOUR_PROJECT",
     storageBucket: "YOUR_PROJECT.appspot.com",
     messagingSenderId: "YOUR_SENDER_ID",
     appId: "YOUR_APP_ID"
-  };// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAI1XaN06qQL_HubtzjvjEYcqbE1P9HFbc",
-  authDomain: "eggbusiness-b810c.firebaseapp.com",
-  databaseURL: "https://eggbusiness-b810c-default-rtdb.firebaseio.com",
-  projectId: "eggbusiness-b810c",
-  storageBucket: "eggbusiness-b810c.firebasestorage.app",
-  messagingSenderId: "186139497776",
-  appId: "1:186139497776:web:bbd944e4dc62565ffba4f5",
-  measurementId: "G-R3NTM2MXML"
-};
+  };
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
-  const loaneesRef = ref(db, "loanees");
+  const auth = getAuth();
 
+  // Sign in anonymously
+  signInAnonymously(auth)
+    .then(() => console.log("Signed in anonymously"))
+    .catch(error => console.error("Auth error:", error));
+
+  const loaneesRef = ref(db, "loanees");
   const form = document.getElementById("loaneeForm");
   const tableBody = document.querySelector("#loaneeTable tbody");
   const grandTotalEl = document.getElementById("grandTotal");
@@ -126,6 +112,7 @@ const firebaseConfig = {
     grandTotalEl.textContent = total;
   }
 
+  // Real-time listener
   onValue(loaneesRef, snapshot => {
     renderTable(snapshot.val());
   });
@@ -140,12 +127,9 @@ const firebaseConfig = {
       amount: Number(document.getElementById("amount").value),
       paid: false
     };
-    push(loaneesRef, loanee);
-    form.reset();
+    push(loaneesRef, loanee).then(() => form.reset());
   });
 </script>
 
 </body>
 </html>
-
-
