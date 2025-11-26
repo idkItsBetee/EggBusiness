@@ -53,16 +53,17 @@
   import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  // Firebase config — replace YOUR_* with your project info
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAI1XaN06qQL_HubtzjvjEYcqbE1P9HFbc",
+  authDomain: "eggbusiness-b810c.firebaseapp.com",
+  databaseURL: "https://eggbusiness-b810c-default-rtdb.firebaseio.com",
+  projectId: "eggbusiness-b810c",
+  storageBucket: "eggbusiness-b810c.firebasestorage.app",
+  messagingSenderId: "186139497776",
+  appId: "1:186139497776:web:bbd944e4dc62565ffba4f5",
+  measurementId: "G-R3NTM2MXML"
+};
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
@@ -133,3 +134,4 @@
 
 </body>
 </html>
+
