@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Egg Loanee Tracker — Online</title>
+<style>
+  body { font-family: Arial, sans-serif; background:#fdfdfd; padding:20px; }
+  h1 { text-align:center; color:#333; }
+  form { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
+  input[type="text"], input[type="number"], input[type="date"] { padding:5px; width:150px; }
+  button { padding:5px 10px; }
+  table { width:100%; border-collapse:collapse; margin-top:20px; }
+  th, td { border:1px solid #ccc; padding:8px; text-align:center; }
+  th { background:#f4f4f4; }
+  .paid { text-decoration: line-through; color: gray; }
+  .total { font-size:18px; font-weight:bold; margin-top:20px; text-align:right; }
+</style>
+</head>
+<body>
+
+<h1>🥚 Egg Loanee Tracker — Online (Cloud)</h1>
+
+<form id="loaneeForm">
+  <input type="text" id="name" placeholder="Name" required>
+  <input type="text" id="address" placeholder="Address" required>
+  <input type="date" id="loanDate" required>
+  <input type="date" id="dueDate" required>
+  <input type="number" id="amount" placeholder="Amount Owed" required>
+  <button type="submit">Add Loanee</button>
+</form>
+
+<table id="loaneeTable">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Address</th>
+      <th>Date Loaned</th>
+      <th>Due Date</th>
+      <th>Amount Owed</th>
+      <th>Paid</th>
+      <th>Remove</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<div class="total">Grand Total Owed: R<span id="grandTotal">0</span></div>
+
+<!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // 🔴 REPLACE WITH YOUR FIREBASE CONFIG
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "SENDER_ID",
+    appId: "APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const loaneesRef = collection(db, "loanees");
+
+  const form = document.getElementById("loaneeForm");
+  const tableBody = document.querySelector("#loaneeTable tbody");
+  const grandTotalEl = document.getElementById("grandTotal");
+
+  function renderTable(loanees) {
+    tableBody.innerHTML = "";
+    let total = 0;
+
+    loanees.forEach(l => {
+      const row = tableBody.insertRow();
+      row.innerHTML = `
+        <td class="${l.paid ? 'paid' : ''}">${l.name}</td>
+        <td class="${l.paid ? 'paid' : ''}">${l.address}</td>
+        <td>${l.loanDate}</td>
+        <td>${l.dueDate}</td>
+        <td>R${l.amount}</td>
+        <td><input type="checkbox" ${l.paid ? "checked" : ""}></td>
+        <td><button>X</button></td>
+      `;
+
+      const checkbox = row.querySelector("input");
+      const removeBtn = row.querySelector("button");
+
+      checkbox.addEventListener("change", async () => {
+        await updateDoc(doc(db, "loanees", l.id), { paid: !l.paid });
+      });
+
+      removeBtn.addEventListener("click", async () => {
+        await deleteDoc(doc(db, "loanees", l.id));
+      });
+
+      if (!l.paid) total += Number(l.amount);
+    });
+
+    grandTotalEl.textContent = total;
+  }
+
+  // REAL-TIME LISTENER
+  onSnapshot(loaneesRef, snapshot => {
+    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderTable(data);
+  });
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const loanee = {
+      name: document.getElementById("name").value,
+      address: document.getElementById("address").value,
+      loanDate: document.getElementById("loanDate").value,
+      dueDate: document.getElementById("dueDate").value,
+      amount: Number(document.getElementById("amount").value),
+      paid: false
+    };
+
+    await addDoc(loaneesRef, loanee);
+    form.reset();
+  });
+</script>
+
+</body>
+</html>
+
