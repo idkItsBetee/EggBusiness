@@ -49,6 +49,17 @@
 
 <!-- Firebase SDKs -->
 <script type="module">
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const auth = getAuth();
+signInAnonymously(auth)
+  .then(() => {
+    console.log("Signed in anonymously");
+  })
+  .catch(error => {
+    console.error("Auth error:", error);
+  });
+
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
@@ -136,4 +147,5 @@ const firebaseConfig = {
 
 </body>
 </html>
+
 
