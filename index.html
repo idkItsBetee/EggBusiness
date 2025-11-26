@@ -19,7 +19,7 @@
 </head>
 <body>
 
-<h1>🥚 Egg Loanee Tracker — Online (Cloud)</h1>
+<h1>🥚 Egg Loanee Tracker — Online (Realtime DB)</h1>
 
 <form id="loaneeForm">
   <input type="text" id="name" placeholder="Name" required>
@@ -50,22 +50,22 @@
 <!-- Firebase SDKs -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, onSnapshot, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
- // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAI1XaN06qQL_HubtzjvjEYcqbE1P9HFbc",
-  authDomain: "eggbusiness-b810c.firebaseapp.com",
-  projectId: "eggbusiness-b810c",
-  storageBucket: "eggbusiness-b810c.firebasestorage.app",
-  messagingSenderId: "186139497776",
-  appId: "1:186139497776:web:bbd944e4dc62565ffba4f5",
-  measurementId: "G-R3NTM2MXML"
-};
+  // Replace with your Firebase config
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
 
   const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const loaneesRef = collection(db, "loanees");
+  const db = getDatabase(app);
+  const loaneesRef = ref(db, "loanees");
 
   const form = document.getElementById("loaneeForm");
   const tableBody = document.querySelector("#loaneeTable tbody");
@@ -75,7 +75,8 @@ const firebaseConfig = {
     tableBody.innerHTML = "";
     let total = 0;
 
-    loanees.forEach(l => {
+    Object.keys(loanees || {}).forEach(key => {
+      const l = loanees[key];
       const row = tableBody.insertRow();
       row.innerHTML = `
         <td class="${l.paid ? 'paid' : ''}">${l.name}</td>
@@ -90,12 +91,12 @@ const firebaseConfig = {
       const checkbox = row.querySelector("input");
       const removeBtn = row.querySelector("button");
 
-      checkbox.addEventListener("change", async () => {
-        await updateDoc(doc(db, "loanees", l.id), { paid: !l.paid });
+      checkbox.addEventListener("change", () => {
+        update(ref(db, 'loanees/' + key), { paid: !l.paid });
       });
 
-      removeBtn.addEventListener("click", async () => {
-        await deleteDoc(doc(db, "loanees", l.id));
+      removeBtn.addEventListener("click", () => {
+        remove(ref(db, 'loanees/' + key));
       });
 
       if (!l.paid) total += Number(l.amount);
@@ -104,15 +105,12 @@ const firebaseConfig = {
     grandTotalEl.textContent = total;
   }
 
-  // REAL-TIME LISTENER
-  onSnapshot(loaneesRef, snapshot => {
-    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    renderTable(data);
+  onValue(loaneesRef, snapshot => {
+    renderTable(snapshot.val());
   });
 
-  form.addEventListener("submit", async e => {
+  form.addEventListener("submit", e => {
     e.preventDefault();
-
     const loanee = {
       name: document.getElementById("name").value,
       address: document.getElementById("address").value,
@@ -121,13 +119,10 @@ const firebaseConfig = {
       amount: Number(document.getElementById("amount").value),
       paid: false
     };
-
-    await addDoc(loaneesRef, loanee);
+    push(loaneesRef, loanee);
     form.reset();
   });
 </script>
 
 </body>
 </html>
-
-
